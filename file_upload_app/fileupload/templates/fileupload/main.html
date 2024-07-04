@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPB MAIN PAGE</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            background-color: #2c3e50;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 80px; /* Adjust this value based on your header's height */
+            overflow-x: hidden;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+
+        .sidebar a.active {
+            background-color: #3498db; /* Different background color */
+            color: white; /* Ensure text is readable */
+            font-weight: bold; /* Make the text bold */
+        }
+
+        .sideBarHeader {
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;           
+            padding: 20px;
+            border-bottom: 1px solid white; 
+            border-bottom-width: 0 10px; 
+        }
+
+        .sideBarHeader img {
+            margin-right: 20px;
+        }
+
+        .logout {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 250px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header img {
+            height: 50px;
+            margin-right: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+            color: #2c3e50;
+        }
+
+        .content-container {
+            margin-left: 250px;
+            height: calc(100vh - 80px); /* Adjust this value based on your header's height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .content {
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .content h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .checkbox-container, .input-container {
+            margin-top: 20px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-container label, .input-container label {
+            margin-right: 10px;
+            font-weight: bold;
+            color: #34495e;
+        }
+
+        .input-container input[type="text"] {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .modify-btn {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .modify-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sideBarHeader">
+        <img src="https://seeklogo.com/images/K/kristu-jayanti-college-logo-32BF7E7E3A-seeklogo.com.png" alt="Kristu Jayanti College Logo" width="50px" height="50px">
+        <h1>EPB</h1>
+    </div>
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Apply Now</a>
+    <div class="logout">
+        <a href="#">Logout</a>
+    </div>
+</div>
+
+<div class="header">
+    <img src="https://seeklogo.com/images/K/kristu-jayanti-college-logo-32BF7E7E3A-seeklogo.com.png" alt="Kristu Jayanti College Logo">
+    <h1>KRISTU JAYANTI COLLEGE (Autonomous)</h1>
+</div>
+
+<div class="content-container">
+    <div class="content">
+        <div class="form-container">
+            <div class="input-container">
+                <label for="report-name">Report Name</label>
+                <form method="POST">
+                    {% csrf_token %}
+                    <select id="report-name" name="report-name">
+                        {% for r_name in report_names_saved %}
+                            <option value="{{ r_name }}">{{ r_name }}</option>
+                        {% endfor %}    
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <h2>Modification</h2>
+        <div class="form-container">
+            <div class="modify-btn">
+                <label>Modify</label>
+            </div>
+        </div>
+
+        <h2>Filteration</h2>
+        <div class="content1">
+            <form id="filterForm">
+                <div class="form-group">
+                    <label for="filter1">Batch Name</label>
+                    <select id="filter1" name="filter1">
+                        <option value="option1">Option 1</option>
+                        <option value="option2">Option 2</option>
+                        <option value="option3">Option 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filter2">Subject Name</label>
+                    <select id="filter2" name="filter2">
+                        <option value="option1">Option 1</option>
+                        <option value="option2">Option 2</option>
+                        <option value="option3">Option 3</option>
+                    </select>
+                </div>
+        
+                <button type="submit" class="filter-button">Filter</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
