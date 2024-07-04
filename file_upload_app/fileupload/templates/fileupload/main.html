@@ -188,7 +188,7 @@
                 <form method="POST">
                     {% csrf_token %}
                     <select id="report-name" name="report-name">
-                        {% for r_name in report_names_saved %}
+                        {% for r_name in reports %}
                             <option value="{{ r_name }}">{{ r_name }}</option>
                         {% endfor %}    
                     </select>

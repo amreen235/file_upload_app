@@ -74,7 +74,12 @@ def upload_file(request):
 
 def display_excel_data(request):
     excel_data = uploaded_data.objects.all()
-    context = {'excel_data': excel_data}
+
+    # you weren't passing this here
+    reports = uploaded_data.objects.values_list('report_name', flat=True).distinct()
+    context = {'excel_data': excel_data, 'reports': reports}
+    # !!
+    
     return render(request, 'fileupload/main.html', context)
 
 def report_display(request):
