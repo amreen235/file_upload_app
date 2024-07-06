@@ -1,5 +1,4 @@
 
-
 # fileupload/models.py
 
 from django.db import models
@@ -64,3 +63,22 @@ class uploaded_data_truncated_og(models.Model):
 
     def str(self):
         return f"{self.report_name} - {self.roll_no} - {self.subject_name}"
+
+class data_sorted(models.Model):
+    batch_name = models.CharField(max_length=255, null=True)
+    student_batch_name = models.CharField(max_length=255, null=True)
+    roll_no = models.CharField(max_length=50, null=True)
+    student_name = models.CharField(max_length=255, null=True)
+    subject_name = models.CharField(max_length=255, null=True)  # Add this line
+    fa_marks = models.FloatField(null=True)
+    sa_marks = models.FloatField(null=True)
+    agg_marks = models.FloatField(null=True)
+    rv_marks = models.FloatField(null=True)
+    rv_updated = models.CharField(max_length=2, null=True)
+    obt_grade = models.CharField(max_length=2, null=True)
+    course_category = models.CharField(max_length=2, null=True)
+    report_name = models.CharField(max_length=255, null=True)
+    
+
+    def str(self):
+        return f"{self.report_name} - {self.roll_no}"

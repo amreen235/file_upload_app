@@ -2,7 +2,7 @@
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from .models import uploaded_data, uploaded_data_truncated_og
+from .models import uploaded_data, uploaded_data_truncated_og, data_sorted
 from .forms import FileUploadForm
 from django.contrib import messages
 import pandas as pd
@@ -49,23 +49,77 @@ def load_data(df, sqlite_file_path, table_name, is_ug, report_name):
     df['report_name'] = report_name
 
     df['exam_type'] = df['exam_type'].replace({
-                    'Formative Assessment (FA)': 'FA',
-                    'Summative Assessment (SA)': 'SA'
-                    })
+        'Formative Assessment (FA)': 'FA',
+        'Summative Assessment (SA)': 'SA'
+    })
+
     df = df.sort_values(by='roll_no')
-    df.loc[(df['exam_type'].isin(['Aggregate', 'SA'])) & (df['obt_marks'] == 0), 'obt_marks'] = ''
-    
-    truncated_df = df[['exam_code', 'student_batch_name', 'batch_name', 'student_name', 'roll_no', 'exam_type', 
-                       'subject_name', 'obt_marks', 'max_marks', 'obt_grade', 'rv_marks', 'rv_updated', 
+    df['obt_marks'] = df.apply(lambda x: '' if (x['exam_type'] in ['Aggregate', 'SA'] and x['obt_marks'] == 0) else x['obt_marks'], axis=1)
+
+    truncated_df = df[['exam_code', 'student_batch_name', 'batch_name', 'student_name', 'roll_no', 'exam_type',
+                       'subject_name', 'obt_marks', 'max_marks', 'obt_grade', 'rv_marks', 'rv_updated',
                        'course_category', 'report_name']]
-     
+
     conn = sqlite3.connect(sqlite_file_path)
-    df.to_sql(table_name, conn, if_exists='append', index=False)      
+    df.to_sql(table_name, conn, if_exists='append', index=False)
     conn.close()
-    
+
     load_truncated_data(truncated_df, "db.sqlite3", "fileupload_uploaded_data_truncated_og")
 
+    aggregate_df = truncated_df[truncated_df['exam_type'] == 'Aggregate']
+
+    # Create a dictionary to map (Student Name, Subject Name) to Obt Grade
+    grade_map = {}
+    for index, row in aggregate_df.iterrows():
+        key = (row['student_name'], row['subject_name'])
+        grade_map[key] = row['obt_grade']
+
+    # Function to fetch grade based on (Student Name, Subject Name)
+    def fetch_grade(student_name, subject_name):
+        key = (student_name, subject_name)
+        return grade_map.get(key, '')
+
+    sorted_df = pd.DataFrame()
+
+    sorted_df['fa_marks'] = pd.NA
+    sorted_df['sa_marks'] = pd.NA
+    sorted_df['agg_marks'] = pd.NA
+    # Populate the sorted_df with data from the original DataFrame
+    rows = []
+    for student in truncated_df['student_name'].unique():
+        student_data = truncated_df[truncated_df['student_name'] == student]
+        for subject in student_data['subject_name'].unique():
+            subject_data = student_data[student_data['subject_name'] == subject]
+            if not subject_data.empty:
+                row = {
+                    'roll_no': subject_data.iloc[0]['roll_no'],
+                    'student_name': student,
+                    'batch_name': subject_data.iloc[0]['batch_name'],
+                    'subject_name': subject,  # Add this line
+                    'fa_marks': subject_data[subject_data['exam_type'] == 'FA']['obt_marks'].values[0] if not subject_data[subject_data['exam_type'] == 'FA'].empty else '',
+                    'sa_marks': subject_data[subject_data['exam_type'] == 'SA']['obt_marks'].values[0] if not subject_data[subject_data['exam_type'] == 'SA'].empty else '',
+                    'agg_marks': subject_data[subject_data['exam_type'] == 'Aggregate']['obt_marks'].values[0] if not subject_data[subject_data['exam_type'] == 'Aggregate'].empty else '',
+                    'obt_grade': fetch_grade(student, subject)
+                }
+                rows.append(row)
+
+    sorted_df = pd.DataFrame(rows)
+
+    sorted_df['rv_marks'] = truncated_df['rv_marks']
+    sorted_df['rv_updated'] = truncated_df['rv_updated']
+    sorted_df['course_category'] = truncated_df['course_category']
+    sorted_df['report_name'] = truncated_df['report_name']
+
+    load_sorted_data(sorted_df, "db.sqlite3", "fileupload_data_sorted")
+
+
 def load_truncated_data(truncated_df, sqlite_file_path, table_name):
+    
+    conn = sqlite3.connect(sqlite_file_path)    
+    truncated_df.to_sql(table_name, conn, if_exists = 'append', index=False)
+    conn.close()
+    
+def load_sorted_data(truncated_df, sqlite_file_path, table_name):
     
     conn = sqlite3.connect(sqlite_file_path)    
     truncated_df.to_sql(table_name, conn, if_exists = 'append', index=False)
@@ -129,33 +183,11 @@ def SubjectName_display(request):
     # SubjectName_dropdown.delete('None')
     return render(request,'fileupload/main.html', {"subject_names_saved" : SubjectName_dropdown})
 
-
 def file_uploaded(request, file_id):
     return HttpResponse(f"File uploaded with ID: {file_id}")
 
-def home(request):
-    return render(request, 'home.html')
-
-
-def filtered_data_view(request):
-    # Initialize filtered_data to avoid UnboundLocalError
-    filtered_data = uploaded_data_truncated_og.objects.none()
-
-    if request.method == "GET":
-        report_name = request.GET.get('report_name')
-        batch_name = request.GET.get('batch_name')
-        subject_name = request.GET.get('subject_name')
-
-        filtered_data = uploaded_data_truncated_og.objects.all()
-
-        if report_name:
-            filtered_data = filtered_data.filter(report_name=report_name)
-        if batch_name:
-            filtered_data = filtered_data.filter(batch_name=batch_name)
-        if subject_name:
-            filtered_data = filtered_data.filter(subject_name=subject_name)
-
-    context = {
-        'filtered_data': filtered_data
-    }
+def display_sorted_data(request):
+    # Fetch only the specified columns
+    sorted_data = data_sorted.objects.values('roll_no', 'student_name', 'batch_name', 'subject_name', 'fa_marks', 'sa_marks', 'agg_marks', 'obt_grade')
+    context = {'sorted_data': sorted_data}
     return render(request, 'fileupload/filter.html', context)

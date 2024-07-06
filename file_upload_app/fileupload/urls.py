@@ -1,3 +1,5 @@
+
+
 from django.urls import path
 from . import views
 
@@ -11,5 +13,6 @@ urlpatterns = [
     path('SubjectName_display/', views.SubjectName_display, name='SubjectName_display'),
     path('get_batch_names/', views.get_batch_names, name='get_batch_names'),
     path('get_subject_names/', views.get_subject_names, name='get_subject_names'),
-    path('filtered_data_view/', views.filtered_data_view, name='filtered_data_view'),
+    path('filter_data/', views.display_sorted_data, name='display_sorted_data'),
+    
 ]
