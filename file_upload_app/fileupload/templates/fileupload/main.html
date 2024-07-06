@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -160,6 +162,46 @@
             background-color: #45a049;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#report-name').change(function() {
+                var reportName = $(this).val();
+                $.ajax({
+                    url: '{% url "get_batch_names" %}',
+                    data: {
+                        'report_name': reportName
+                    },
+                    success: function(data) {
+                        var batchDropdown = $('#batch-name');
+                        batchDropdown.empty();
+                        batchDropdown.append('<option selected disabled>Select Batch Name</option>');
+                        $.each(data.batch_names, function(index, batch_name) {
+                            batchDropdown.append('<option value="' + batch_name + '">' + batch_name + '</option>');
+                        });
+                    }
+                });
+            });
+
+            $('#batch-name').change(function() {
+                var batchName = $(this).val();
+                $.ajax({
+                    url: '{% url "get_subject_names" %}',
+                    data: {
+                        'batch_name': batchName
+                    },
+                    success: function(data) {
+                        var subjectDropdown = $('#subject-name');
+                        subjectDropdown.empty();
+                        subjectDropdown.append('<option selected disabled>Select Subject Name</option>');
+                        $.each(data.subject_names, function(index, subject_name) {
+                            subjectDropdown.append('<option value="' + subject_name + '">' + subject_name + '</option>');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
 
@@ -188,6 +230,7 @@
                 <form method="POST">
                     {% csrf_token %}
                     <select id="report-name" name="report-name">
+                        <option selected disabled>Select Report Name</option>
                         {% for r_name in reports %}
                             <option value="{{ r_name }}">{{ r_name }}</option>
                         {% endfor %}    
@@ -196,38 +239,34 @@
             </div>
         </div>
 
-        <h2>Modification</h2>
-        <div class="form-container">
-            <div class="modify-btn">
-                <label>Modify</label>
-            </div>
-        </div>
-
         <h2>Filteration</h2>
         <div class="content1">
             <form id="filterForm">
                 <div class="form-group">
-                    <label for="filter1">Batch Name</label>
-                    <select id="filter1" name="filter1">
-                        <option value="option1">Option 1</option>
-                        <option value="option2">Option 2</option>
-                        <option value="option3">Option 3</option>
-                    </select>
+                    <label for="batch-name">Batch Name</label>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <select id="batch-name" name="batch-name">
+                            <option selected disabled>Select Batch Name</option>
+                        </select>
+                    </form>
                 </div>
                 <div class="form-group">
-                    <label for="filter2">Subject Name</label>
-                    <select id="filter2" name="filter2">
-                        <option value="option1">Option 1</option>
-                        <option value="option2">Option 2</option>
-                        <option value="option3">Option 3</option>
-                    </select>
+                    <label for="subject-name">Subject Name</label>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <select id="subject-name" name="subject-name">
+                            <option selected disabled>Select Subject Name</option>
+                        </select>
+                    </form>
                 </div>
-        
+                <form method="post" enctype="multipart/form-data" action="{% url 'filter_table' %}">
+                {% csrf_token %}
                 <button type="submit" class="filter-button">Filter</button>
+                
             </form>
         </div>
     </div>
 </div>
-
 </body>
 </html>

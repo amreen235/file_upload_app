@@ -1,10 +1,22 @@
+
+
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import uploaded_data
+from django.http import HttpResponse, JsonResponse
+from .models import uploaded_data, uploaded_data_truncated_og
 from .forms import FileUploadForm
 from django.contrib import messages
 import pandas as pd
 import sqlite3
+
+def get_batch_names(request):
+    report_name = request.GET.get('report_name')
+    batch_names = uploaded_data_truncated_og.objects.filter(report_name=report_name).values_list('batch_name', flat=True).distinct()
+    return JsonResponse({'batch_names': list(batch_names)})
+
+def get_subject_names(request):
+    batch_name = request.GET.get('batch_name')
+    subject_names = uploaded_data_truncated_og.objects.filter(batch_name=batch_name).values_list('subject_name', flat=True).distinct()
+    return JsonResponse({'subject_names': list(subject_names)})
 
 def load_data(df, sqlite_file_path, table_name, is_ug, report_name):
     column_mapping = {
@@ -36,11 +48,29 @@ def load_data(df, sqlite_file_path, table_name, is_ug, report_name):
     df['course_category'] = 'UG' if is_ug else 'PG'
     df['report_name'] = report_name
 
+    df['exam_type'] = df['exam_type'].replace({
+                    'Formative Assessment (FA)': 'FA',
+                    'Summative Assessment (SA)': 'SA'
+                    })
+    df = df.sort_values(by='roll_no')
+    df.loc[(df['exam_type'].isin(['Aggregate', 'SA'])) & (df['obt_marks'] == 0), 'obt_marks'] = ''
+    
+    truncated_df = df[['exam_code', 'student_batch_name', 'batch_name', 'student_name', 'roll_no', 'exam_type', 
+                       'subject_name', 'obt_marks', 'max_marks', 'obt_grade', 'rv_marks', 'rv_updated', 
+                       'course_category', 'report_name']]
+     
     conn = sqlite3.connect(sqlite_file_path)
-    df.to_sql(table_name, conn, if_exists='append', index=False)
+    df.to_sql(table_name, conn, if_exists='append', index=False)      
     conn.close()
+    
+    load_truncated_data(truncated_df, "db.sqlite3", "fileupload_uploaded_data_truncated_og")
 
-
+def load_truncated_data(truncated_df, sqlite_file_path, table_name):
+    
+    conn = sqlite3.connect(sqlite_file_path)    
+    truncated_df.to_sql(table_name, conn, if_exists = 'append', index=False)
+    conn.close()
+    
 def upload_file(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
@@ -73,21 +103,34 @@ def upload_file(request):
 
 
 def display_excel_data(request):
-    excel_data = uploaded_data.objects.all()
+    excel_data = uploaded_data_truncated_og.objects.all()
 
-    # you weren't passing this here
-    reports = uploaded_data.objects.values_list('report_name', flat=True).distinct()
-    context = {'excel_data': excel_data, 'reports': reports}
-    # !!
-    
+    reports = uploaded_data_truncated_og.objects.values_list('report_name', flat=True).distinct()
+    batch_name = uploaded_data_truncated_og.objects.values_list('batch_name', flat=True).distinct()
+    subject_name = uploaded_data_truncated_og.objects.filter(subject_name__isnull = False).values_list('subject_name', flat=True).distinct()
+    context = {'excel_data': excel_data, 
+               'reports': reports,
+               'batch_name' : batch_name,
+               'subject_name' : subject_name}
+     
     return render(request, 'fileupload/main.html', context)
+    
 
 def report_display(request):
-    report_dropdown = uploaded_data.objects.values_list('report_name', flat=True).distinct()
+    report_dropdown = uploaded_data_truncated_og.objects.values_list('report_name', flat=True).distinct()
     return render(request,'fileupload/main.html', {"report_names_saved" : report_dropdown})
 
-def upload_success(request):
-    return render(request, 'fileupload/upload_success.html')
+def BatchName_display(request):
+    BatchName_dropdown = uploaded_data_truncated_og.objects.values_list('batch_name', flat=True).distinct()
+    return render(request,'fileupload/main.html', {"batch_names_saved" : BatchName_dropdown})
+
+def SubjectName_display(request):
+    SubjectName_dropdown = uploaded_data_truncated_og.objects.values_list('subject_name', flat=True).distinct()
+    # SubjectName_dropdown.delete('None')
+    return render(request,'fileupload/main.html', {"subject_names_saved" : SubjectName_dropdown})
+
+def filter_table(request):
+    return render(request, 'fileupload/filter.html')
 
 def file_uploaded(request, file_id):
     return HttpResponse(f"File uploaded with ID: {file_id}")
