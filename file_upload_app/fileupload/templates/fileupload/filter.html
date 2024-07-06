@@ -1,50 +1,6 @@
-
-
-<!-- filtered_results.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtered Results</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-
-        .content-container {
-            margin: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #bdc3c7;
-            text-align: left;
-        }
-
-        th {
-            background-color: #34495e;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-<div class="content-container">
-    <h2>Filtered Results for {{ report_name }} - {{ batch_name }} - {{ subject_name }}</h2>
-    <table>
-        <thead>
+<!-- your_template.html -->
+<table>
+    <thead>
         <tr>
             <th>Exam Code</th>
             <th>Student Batch Name</th>
@@ -53,15 +9,15 @@
             <th>Roll No</th>
             <th>Exam Type</th>
             <th>Subject Name</th>
-            <th>Obt Marks</th>
+            <th>Obtained Marks</th>
             <th>Max Marks</th>
-            <th>Obt Grade</th>
+            <th>Obtained Grade</th>
             <th>RV Marks</th>
             <th>RV Updated</th>
             <th>Course Category</th>
         </tr>
-        </thead>
-        <tbody>
+    </thead>
+    <tbody>
         {% for data in filtered_data %}
             <tr>
                 <td>{{ data.exam_code }}</td>
@@ -79,8 +35,5 @@
                 <td>{{ data.course_category }}</td>
             </tr>
         {% endfor %}
-        </tbody>
-    </table>
-</div>
-</body>
-</html>
+    </tbody>
+</table>

@@ -260,7 +260,7 @@
                         </select>
                     </form>
                 </div>
-                <form method="post" enctype="multipart/form-data" action="{% url 'filter_table' %}">
+                <form method="post" enctype="multipart/form-data" action="{% url 'filtered_data_view' %}">
                 {% csrf_token %}
                 <button type="submit" class="filter-button">Filter</button>
                 

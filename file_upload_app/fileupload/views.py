@@ -129,11 +129,33 @@ def SubjectName_display(request):
     # SubjectName_dropdown.delete('None')
     return render(request,'fileupload/main.html', {"subject_names_saved" : SubjectName_dropdown})
 
-def filter_table(request):
-    return render(request, 'fileupload/filter.html')
 
 def file_uploaded(request, file_id):
     return HttpResponse(f"File uploaded with ID: {file_id}")
 
 def home(request):
     return render(request, 'home.html')
+
+
+def filtered_data_view(request):
+    # Initialize filtered_data to avoid UnboundLocalError
+    filtered_data = uploaded_data_truncated_og.objects.none()
+
+    if request.method == "GET":
+        report_name = request.GET.get('report_name')
+        batch_name = request.GET.get('batch_name')
+        subject_name = request.GET.get('subject_name')
+
+        filtered_data = uploaded_data_truncated_og.objects.all()
+
+        if report_name:
+            filtered_data = filtered_data.filter(report_name=report_name)
+        if batch_name:
+            filtered_data = filtered_data.filter(batch_name=batch_name)
+        if subject_name:
+            filtered_data = filtered_data.filter(subject_name=subject_name)
+
+    context = {
+        'filtered_data': filtered_data
+    }
+    return render(request, 'fileupload/filter.html', context)
