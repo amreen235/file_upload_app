@@ -49,20 +49,20 @@
             <th>Subject Name</th>
             <th>FA Marks</th>
             <th>SA Marks</th>
-            <th>Aggregate Marks</th>
-            <th>Obtained Grade</th>
+            <th>Agg Marks</th>
+            <th>Obt Grade</th>
         </tr>
         </thead>
         <tbody>
-        {% for data in sorted_data %}
+        {% for data in report_data %}
             <tr>
                 <td>{{ data.roll_no }}</td>
                 <td>{{ data.student_name }}</td>
                 <td>{{ data.batch_name }}</td>
                 <td>{{ data.subject_name }}</td>
-                <td>{{ data.fa_marks }}</td>
-                <td>{{ data.sa_marks }}</td>
-                <td>{{ data.agg_marks }}</td>
+                <td>{{ data.fa }}</td>
+                <td>{{ data.sa }}</td>
+                <td>{{ data.aggregate }}</td>
                 <td>{{ data.obt_grade }}</td>
             </tr>
         {% endfor %}
