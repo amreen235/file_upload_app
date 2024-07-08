@@ -116,8 +116,6 @@ def filtered_report(request):
 
     fd_df = pd.DataFrame.from_records(filtered_data)
 
-    print(fd_df)
-
     rows = []
     if not fd_df.empty:
         for roll_no in fd_df['roll_no'].unique():
@@ -137,7 +135,5 @@ def filtered_report(request):
                     }
                     rows.append(row)
     
-    print(rows)
-
     context = {'report_data': rows}
     return render(request, 'fileupload/filtered_data.html', context)
