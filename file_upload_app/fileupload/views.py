@@ -72,18 +72,18 @@ def upload_file(request):
         report_name = request.POST['report_name']
 
         if form.is_valid():
-            # get form values
+
             course_category = request.POST['course_category']
             report_name = request.POST['report_name']
 
             uploaded_file = request.FILES['input_excel']
             df = pd.read_excel(uploaded_file)
 
-            # Ensure course_category is either 'UG' or 'PG'
+            
             if course_category.upper() in dict(uploaded_data.COURSE_CATEGORIES):
                 is_ug = (course_category == uploaded_data.UG)
             else:
-                # Handle invalid case, default to False (PG)
+               
                 is_ug = False
 
             load_data(df, "db.sqlite3", "fileupload_uploaded_data",
@@ -139,7 +139,7 @@ def filtered_report(request):
     
     fd_df['obt_marks'] = pd.to_numeric(fd_df['obt_marks'], errors='coerce')
 
-    # Calculate summary values
+  
     max_sa = fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].max() if not fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].dropna().empty else None
     min_sa = fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].min() if not fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].dropna().empty else None
     max_agg = fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].max() if not fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].dropna().empty else None

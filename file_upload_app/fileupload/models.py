@@ -34,7 +34,7 @@ class uploaded_data(models.Model):
     rv_marks = models.FloatField(null=True)
     rv_updated = models.CharField(max_length=2, null=True)
 
-    # extra columns
+    
     course_category = models.CharField(
         max_length=2,
         choices=COURSE_CATEGORIES
