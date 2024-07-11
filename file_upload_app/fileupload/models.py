@@ -43,4 +43,3 @@ class uploaded_data(models.Model):
 
     def str(self):
         return f"{self.report_name} - {self.roll_no} - {self.subject_name}"
-    

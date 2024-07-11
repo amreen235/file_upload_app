@@ -112,9 +112,11 @@ def filtered_report(request):
     batch_name = request.POST['batch_name']
     subject_code = request.POST['subject']
 
-    filtered_data = uploaded_data.objects.filter(report_name = report_name, batch_name = batch_name, subject_code = subject_code).values()
+    filtered_data = uploaded_data.objects.filter(report_name=report_name, batch_name=batch_name, subject_code=subject_code).values()
 
     fd_df = pd.DataFrame.from_records(filtered_data)
+
+    subject_name = fd_df['subject_name'].iloc[0] if not fd_df.empty else None
 
     rows = []
     if not fd_df.empty:
@@ -135,5 +137,23 @@ def filtered_report(request):
                     }
                     rows.append(row)
     
-    context = {'report_data': rows}
+    fd_df['obt_marks'] = pd.to_numeric(fd_df['obt_marks'], errors='coerce')
+
+    # Calculate summary values
+    max_sa = fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].max() if not fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].dropna().empty else None
+    min_sa = fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].min() if not fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].dropna().empty else None
+    max_agg = fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].max() if not fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].dropna().empty else None
+    min_agg = fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].min() if not fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].dropna().empty else None
+    count_f_grades = len(fd_df[fd_df['obt_grade'] == 'F']) if 'obt_grade' in fd_df.columns else 0
+
+    context = {
+        'subject_name' : subject_name,
+        'report_data': rows,
+        'max_sa': max_sa,
+        'min_sa': min_sa,
+        'max_agg': max_agg,
+        'min_agg': min_agg,
+        'count_f_grades': count_f_grades
+    }
+   
     return render(request, 'fileupload/filtered_data.html', context)

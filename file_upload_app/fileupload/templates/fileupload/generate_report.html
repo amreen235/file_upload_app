@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -6,10 +7,10 @@
     <title>EPB MAIN PAGE</title>
     <style>
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f4f4f9;
+        background-color: #e1e1f5;
       }
 
       .sidebar {
@@ -46,15 +47,18 @@
       .sideBarHeader {
         color: white;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        border-bottom: 1px solid white;
-        border-bottom-width: 0 10px;
+        border-bottom: 2px solid #34495e;
+        padding-bottom: 20px; /* Padding */
+        margin-bottom: 20px;
       }
 
       .sideBarHeader img {
-        margin-right: 20px;
+        width: 80px; /* Adjusted width */
+        height: 80px; /* Added height for a square logo */
+        border-radius: 50%; /* Circular logo */
+        object-fit: cover;
+        margin-right: 15px;
+        margin-left: 20px;
       }
 
       .logout {
@@ -87,18 +91,17 @@
 
       .content-container {
         margin-left: 250px;
-        height: calc(
-          100vh - 80px
-        ); /* Adjust this value based on your header's height */
+        height: calc(100vh - 80px); /* Adjust this value based on your header's height */
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 20px;
         box-sizing: border-box;
+        height: 80%;
       }
 
       .content {
-        padding: 40px;
+        padding: 30px;
         background-color: white;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -107,12 +110,12 @@
         align-items: flex-start;
         text-align: center;
         width: 100%;
-        max-width: 600px;
+        height: 80%;
       }
 
       .content h2 {
-        font-size: 28px;
-        margin-bottom: 20px;
+        font-size: 30px;
+        margin-bottom: 10px;
         color: #34495e;
       }
 
@@ -123,7 +126,11 @@
         width: 100%;
       }
 
-      .checkbox-container,
+      .form-group{
+        font-size: 20px;
+        color: #233140;
+      }
+
       .input-container {
         margin-top: 20px;
         width: 100%;
@@ -131,22 +138,65 @@
         align-items: center;
       }
 
-      .checkbox-container label,
       .input-container label {
         margin-right: 10px;
         font-weight: bold;
         color: #34495e;
+        display: inline-block; /* Display label inline */
+        margin-bottom: 0; /* Remove any bottom margin */
       }
 
-      .input-container input[type="text"] {
-        padding: 10px;
-        border: 1px solid #bdc3c7;
-        border-radius: 4px;
-        width: 100%;
-        box-sizing: border-box;
+      .input-container select {
+        padding: 15px; /* Increase padding for better visibility */
+        border-radius: 10px;
+        border: 2px solid #3498db;
+        font-size: 16px;
+        background-color: white;
+        appearance: none; /* Remove default arrow */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEuMDAwNDQgNkw3LjAwMDEgMTIuMDAwMSAxMyAwIiBzdHJva2U9IiMzNDk4REIiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4K');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        width: 100%; /* Make select box full width */
+        box-sizing: border-box; /* Include padding and border in width */
       }
 
-      .modify-btn {
+      .input-container select::-ms-expand {
+        display: none; /* Remove default arrow in IE */
+      }
+
+      .nav-links {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .nav-links li {
+        margin-bottom: 15px; /* Increased margin */
+      }
+
+      .nav-links a {
+        color: #ecf0f1;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 15px 20px; /* Increased padding */
+        border-radius: 5px;
+        transition: background 0.3s, color 0.3s; /* Smooth transitions */
+      }
+
+      .nav-links a.active,
+      .nav-links a:hover {
+        background-color: #2980b9;
+        color: #fff;
+      }
+
+      .filter-area {
+        margin-top: 40px;
+        margin-bottom: 50px;
+      }
+
+      .filter-button {
         background-color: #4caf50; /* Green */
         border: none;
         color: white;
@@ -158,10 +208,30 @@
         margin: 4px 2px;
         cursor: pointer;
         border-radius: 5px;
+        margin-top: 30px;
       }
 
-      .modify-btn:hover {
+      .filter-button:hover {
         background-color: #45a049;
+      }
+
+      select {
+        width: 100%;
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #3498db;
+        font-size: 16px;
+        background-color: white;
+        appearance: none; /* Remove default arrow */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEuMDAwNDQgNkw3LjAwMDEgMTIuMDAwMSAxMyAwIiBzdHJva2U9IiMzNDk4REIiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4K');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+      }
+
+      select::-ms-expand {
+        display: none; /* Remove default arrow in IE */
       }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -191,31 +261,31 @@
               });
             },
           });
+        });
 
-          $("#batch-name").change(function () {
-            var batchName = $(this).val();
-            $.ajax({
-              url: '{% url "get_subject_names" %}',
-              data: {
-                batch_name: batchName,
-              },
-              success: function (data) {
-                var subjectDropdown = $("#subject");
-                subjectDropdown.empty();
+        $("#batch-name").change(function () {
+          var batchName = $(this).val();
+          $.ajax({
+            url: '{% url "get_subject_names" %}',
+            data: {
+              batch_name: batchName,
+            },
+            success: function (data) {
+              var subjectDropdown = $("#subject");
+              subjectDropdown.empty();
+              subjectDropdown.append(
+                "<option selected disabled>Select Subject Name</option>"
+              );
+              $.each(data.subject_names, function (index, subject_name) {
                 subjectDropdown.append(
-                  "<option selected disabled>Select Subject Name</option>"
+                  '<option value="' +
+                    subject_name[1] +
+                    '">' +
+                    `(${subject_name[1]}) ${subject_name[0]}` +
+                    "</option>"
                 );
-                $.each(data.subject_names, function (index, subject_name) {
-                  subjectDropdown.append(
-                    '<option value="' +
-                      subject_name[1] +
-                      '">' +
-                      `(${subject_name[1]}) ${subject_name[0]}` +
-                      "</option>"
-                  );
-                });
-              },
-            });
+              });
+            },
           });
         });
       });
@@ -224,19 +294,12 @@
   <body>
     <div class="sidebar">
       <div class="sideBarHeader">
-        <img
-          src="https://seeklogo.com/images/K/kristu-jayanti-college-logo-32BF7E7E3A-seeklogo.com.png"
-          alt="Kristu Jayanti College Logo"
-          width="50px"
-          height="50px"
-        />
+        <img src="https://media.licdn.com/dms/image/D560BAQEd_OgvmU6R7g/company-logo_200_200/0/1706011375138?e=2147483647&v=beta&t=3GqcZkhysmg649PBAe8H8f4kAzzL-Q9VbXwlYOCrnzk" alt="Kristu Jayanti College Logo" />
         <h1>EPB</h1>
       </div>
-      <a href="#" class="active">Dashboard</a>
-      <a href="#">Apply Now</a>
-      <div class="logout">
-        <a href="#">Logout</a>
-      </div>
+      <ul class="nav-links">
+        <li><a href="#" class="active">Dashboard</a></li>
+      </ul>
     </div>
 
     <div class="header">
@@ -257,7 +320,7 @@
           >
             {% csrf_token %}
             <div class="input-container">
-              <label for="report-name">Report Name</label>
+              <label for="report-name"><h3>REPORT NAME : </h3></label>
               <select id="report-name" name="report_name">
                 <option selected disabled>Select Report Name</option>
                 {% for r_name in reports %}
@@ -265,24 +328,24 @@
                 {% endfor %}
               </select>
             </div>
-
-            <h2>Filters</h2>
-            <div class="content1">
-              <div class="form-group">
-                <label for="batch-name">Batch Name</label>
-                <select id="batch-name" name="batch_name">
-                  <option selected disabled>Select Batch Name</option>
-                </select>
+            <div class="filter-area">
+              <h2><b>APPLY FILTERS</b></h2><br>
+              <div class="content1">
+                <div class="form-group">
+                  <label for="batch-name"><b>Batch Name : </b><br></label>
+                  <select id="batch-name" name="batch_name">
+                    <option selected disabled>Select Batch Name</option>
+                  </select><br><br>
+                </div>
+                <div class="form-group">
+                  <label for="subject"><b>Subject Name : </b><br></label>
+                  <select id="subject" name="subject">
+                    <option selected disabled>Select Subject Name</option>
+                  </select>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="subject">Subject Name</label>
-                <select id="subject" name="subject">
-                  <option selected disabled>Select Subject Name</option>
-                </select>
-              </div>
+              <button type="submit" class="filter-button"><b>FILTER</b></button>
             </div>
-
-            <button type="submit" class="filter-button">Filter</button>
           </form>
         </div>
       </div>
