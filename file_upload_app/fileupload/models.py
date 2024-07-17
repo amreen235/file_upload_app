@@ -1,14 +1,46 @@
-
-# fileupload/models.py
-
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
+class MyUserManager(BaseUserManager):
+    def create_user(self, username, password=None):
+        if not username:
+            raise ValueError("Users must have a username")
+        user = self.model(username=username)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, password=None):
+        user = self.create_user(username=username, password=password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+class MyUser(AbstractBaseUser):
+    username = models.CharField(max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    objects = MyUserManager()
+
+    USERNAME_FIELD = 'username'
+
+    def _str_(self):
+        return self.username
+
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
+
+    def has_module_perms(self, app_label):
+        return self.is_admin
     
 class uploaded_data(models.Model):
     UG = 'UG'
     PG = 'PG'
     
     COURSE_CATEGORIES = [
-        (UG, PG)
+        (UG, 'Undergraduate'),
+        (PG, 'Postgraduate')
     ]
 
     exam_code = models.CharField(max_length=100, null=True)
@@ -34,12 +66,12 @@ class uploaded_data(models.Model):
     rv_marks = models.FloatField(null=True)
     rv_updated = models.CharField(max_length=2, null=True)
 
-    
+    # extra columns
     course_category = models.CharField(
         max_length=2,
         choices=COURSE_CATEGORIES
     )
     report_name = models.CharField(max_length=255, null=True)
 
-    def str(self):
+    def _str_(self):
         return f"{self.report_name} - {self.roll_no} - {self.subject_name}"

@@ -1,18 +1,61 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from .models import uploaded_data
+from django.http import JsonResponse, HttpResponse
+from .models import uploaded_data, MyUser
 from .forms import FileUploadForm
 from django.contrib import messages
 import pandas as pd
 import sqlite3
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.hashers import make_password, check_password
+import logging
+from .decorators import custom_login_required
 
+def signup_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        if MyUser.objects.filter(username=username).exists():
+            return HttpResponse("Username already exists")
+        user = MyUser(username=username, password=make_password(password))
+        user.save()
+        # Redirect to upload.html after signup
+        return redirect('upload_file')
+    return render(request, 'fileupload/signup.html')
+
+logger = logging.getLogger(__name__)
+ 
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        try:
+            user = MyUser.objects.get(username=username)
+            if check_password(password, user.password):
+                login(request, user)
+                # Redirect to upload.html after login
+                return redirect('upload_file')
+            else:
+                messages.error(request, 'Incorrect password')
+        except MyUser.DoesNotExist:
+            messages.error(request, 'Username does not exist')
+
+    return render(request, 'fileupload/signin.html')
+
+def home_view(request):
+    return render(request, 'fileupload/index.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+@custom_login_required 
 def get_batch_names(request):
     report_name = request.GET.get('report_name')
     batch_names = uploaded_data.objects.filter(
         report_name=report_name, batch_name__isnull=False).values_list('batch_name', flat=True).distinct()
     return JsonResponse({'batch_names': list(batch_names)})
 
-
+@custom_login_required
 def get_subject_names(request):
     batch_name = request.GET.get('batch_name')
     subject_names = uploaded_data.objects.filter(
@@ -63,7 +106,7 @@ def load_data(df, sqlite_file_path, table_name, is_ug, report_name):
     df.to_sql(table_name, conn, if_exists='append', index=False)
     conn.close()
 
-
+@custom_login_required
 def upload_file(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
@@ -72,18 +115,18 @@ def upload_file(request):
         report_name = request.POST['report_name']
 
         if form.is_valid():
-
+            # get form values
             course_category = request.POST['course_category']
             report_name = request.POST['report_name']
 
             uploaded_file = request.FILES['input_excel']
             df = pd.read_excel(uploaded_file)
 
-            
+            # Ensure course_category is either 'UG' or 'PG'
             if course_category.upper() in dict(uploaded_data.COURSE_CATEGORIES):
                 is_ug = (course_category == uploaded_data.UG)
             else:
-               
+                # Handle invalid case, default to False (PG)
                 is_ug = False
 
             load_data(df, "db.sqlite3", "fileupload_uploaded_data",
@@ -95,7 +138,7 @@ def upload_file(request):
         form = FileUploadForm()
     return render(request, 'fileupload/upload.html', {'form': form})
 
-
+@custom_login_required
 def generate_report(request):
     excel_data = uploaded_data.objects.all()
 
@@ -107,6 +150,7 @@ def generate_report(request):
 
     return render(request, 'fileupload/generate_report.html', context)
 
+@custom_login_required
 def filtered_report(request):
     report_name = request.POST['report_name']
     batch_name = request.POST['batch_name']
@@ -139,7 +183,7 @@ def filtered_report(request):
     
     fd_df['obt_marks'] = pd.to_numeric(fd_df['obt_marks'], errors='coerce')
 
-  
+    # Calculate summary values
     max_sa = fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].max() if not fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].dropna().empty else None
     min_sa = fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].min() if not fd_df[fd_df['exam_type'] == 'SA']['obt_marks'].dropna().empty else None
     max_agg = fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].max() if not fd_df[fd_df['exam_type'] == 'Aggregate']['obt_marks'].dropna().empty else None
