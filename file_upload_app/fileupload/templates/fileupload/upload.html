@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -21,7 +20,7 @@
                 position: fixed;
                 left: 0;
                 top: 0;
-                padding-top: 80px; 
+                padding-top: 80px; /* Adjust this value based on your header's height */
                 overflow-x: hidden;
                 box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             }
@@ -40,23 +39,23 @@
             }
 
             .sidebar a.active {
-                background-color: #3498db; 
-                color: white; 
-                font-weight: bold; 
+                background-color: #3498db; /* Different background color */
+                color: white; /* Ensure text is readable */
+                font-weight: bold; /* Make the text bold */
             }
 
             .sideBarHeader{
                 color: white;
                 display: flex;
                 border-bottom: 2px solid #34495e;
-                padding-bottom: 20px;
+                padding-bottom: 20px; /* Padding */
                 margin-bottom: 20px;
             }
 
             .sideBarHeader img {
-                width: 80px; 
-                height: 80px; 
-                border-radius: 50%; 
+                width: 80px; /* Adjusted width */
+                height: 80px; /* Added height for a square logo */
+                border-radius: 50%; /* Circular logo */
                 object-fit: cover;
                 margin-right: 20px;
                 margin-left: 20px;
@@ -93,7 +92,7 @@
 
             .content-container {
                 margin-left: 250px;
-                height: calc(100vh - 80px);
+                height: calc(100vh - 80px); /* Adjust this value based on your header's height */
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -171,18 +170,18 @@
 
             .form-container .drop-zone {
                 border: 2px dashed #ccc;
-                padding: 60px; 
+                padding: 60px; /* Increased padding */
                 text-align: center;
-                margin-bottom: 25px;
+                margin-bottom: 25px; /* Increased margin */
                 border-radius: 5px;
             }
 
             .form-container .drop-zone p {
-                margin-bottom: 12px; 
+                margin-bottom: 12px; /* Increased margin */
             }
 
             .upload-btn {
-                background-color: #4CAF50; 
+                background-color: #4CAF50; /* Green */
                 border: none;
                 color: white;
                 padding: 15px 32px;
@@ -210,7 +209,7 @@
             }
 
             .nav-links li {
-                margin-bottom: 15px; 
+                margin-bottom: 15px; /* Increased margin */
             }
 
             .nav-links a {
@@ -218,9 +217,9 @@
                 text-decoration: none;
                 display: flex;
                 align-items: center;
-                padding: 15px 20px; 
+                padding: 15px 20px; /* Increased padding */
                 border-radius: 5px;
-                transition: background 0.3s, color 0.3s; 
+                transition: background 0.3s, color 0.3s; /* Smooth transitions */
             }
 
             .nav-links a.active, .nav-links a:hover {
@@ -232,7 +231,7 @@
     <body>
         <div class="sidebar">
             <div class = "sideBarHeader">
-                <img src="https://media.licdn.com/dms/image/D560BAQEd_OgvmU6R7g/company-logo_200_200/0/1706011375138?e=2147483647&v=beta&t=3GqcZkhysmg649PBAe8H8f4kAzzL-Q9VbXwlYOCrnzk" alt="Kristu Jayanti College Logo" width="50px" height="50px">
+                <img src="https://media.licdn.com/dms/image/D560BAQEd_OgvmU6R7g/company-logo_200_200/0/1706011375138?e=2147483647&v=beta&t=3GqcZkhysmg649PBAe8H8f4kAzzL-Q9VbXwlYOCrnzk" alt="Kristu Jayanti College Logo" />
                 <h1>EPB</h1>
             </div>
             <ul class="nav-links">

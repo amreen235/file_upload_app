@@ -6,39 +6,37 @@ from django.contrib import messages
 import pandas as pd
 import sqlite3
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required as django_login_required
 from django.contrib.auth.hashers import make_password, check_password
 import logging
-from .decorators import custom_login_required
+from .decorators import custom_login_required  # Import the custom decorator
 
 def signup_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         if MyUser.objects.filter(username=username).exists():
-            return HttpResponse("Username already exists")
+            messages.error(request, "Username already exists")
+            return redirect('signup')
         user = MyUser(username=username, password=make_password(password))
         user.save()
-        # Redirect to upload.html after signup
+        login(request, user)
         return redirect('upload_file')
     return render(request, 'fileupload/signup.html')
 
 logger = logging.getLogger(__name__)
- 
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        try:
-            user = MyUser.objects.get(username=username)
-            if check_password(password, user.password):
-                login(request, user)
-                # Redirect to upload.html after login
-                return redirect('upload_file')
-            else:
-                messages.error(request, 'Incorrect password')
-        except MyUser.DoesNotExist:
-            messages.error(request, 'Username does not exist')
-
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('upload_file')
+        else:
+            messages.error(request, 'Invalid username or password')
+            logger.error(f'Login failed for username: {username}')
     return render(request, 'fileupload/signin.html')
 
 def home_view(request):
@@ -46,23 +44,21 @@ def home_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
-@custom_login_required 
+@custom_login_required  # Apply the custom decorator
 def get_batch_names(request):
     report_name = request.GET.get('report_name')
     batch_names = uploaded_data.objects.filter(
         report_name=report_name, batch_name__isnull=False).values_list('batch_name', flat=True).distinct()
     return JsonResponse({'batch_names': list(batch_names)})
 
-@custom_login_required
+@custom_login_required  # Apply the custom decorator
 def get_subject_names(request):
     batch_name = request.GET.get('batch_name')
     subject_names = uploaded_data.objects.filter(
         batch_name=batch_name, subject_name__isnull=False).values_list('subject_name', 'subject_code').distinct()
-    
     return JsonResponse({'subject_names': list(subject_names)})
-
 
 def load_data(df, sqlite_file_path, table_name, is_ug, report_name):
     column_mapping = {
@@ -106,7 +102,7 @@ def load_data(df, sqlite_file_path, table_name, is_ug, report_name):
     df.to_sql(table_name, conn, if_exists='append', index=False)
     conn.close()
 
-@custom_login_required
+@custom_login_required  # Apply the custom decorator
 def upload_file(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
@@ -115,10 +111,6 @@ def upload_file(request):
         report_name = request.POST['report_name']
 
         if form.is_valid():
-            # get form values
-            course_category = request.POST['course_category']
-            report_name = request.POST['report_name']
-
             uploaded_file = request.FILES['input_excel']
             df = pd.read_excel(uploaded_file)
 
@@ -126,11 +118,9 @@ def upload_file(request):
             if course_category.upper() in dict(uploaded_data.COURSE_CATEGORIES):
                 is_ug = (course_category == uploaded_data.UG)
             else:
-                # Handle invalid case, default to False (PG)
                 is_ug = False
 
-            load_data(df, "db.sqlite3", "fileupload_uploaded_data",
-                      is_ug, report_name)
+            load_data(df, "db.sqlite3", "fileupload_uploaded_data", is_ug, report_name)
 
             messages.success(request, 'Successfully Uploaded')
             return redirect('generate_report')
@@ -138,7 +128,7 @@ def upload_file(request):
         form = FileUploadForm()
     return render(request, 'fileupload/upload.html', {'form': form})
 
-@custom_login_required
+@custom_login_required  # Apply the custom decorator
 def generate_report(request):
     excel_data = uploaded_data.objects.all()
 
@@ -150,7 +140,7 @@ def generate_report(request):
 
     return render(request, 'fileupload/generate_report.html', context)
 
-@custom_login_required
+@custom_login_required  # Apply the custom decorator
 def filtered_report(request):
     report_name = request.POST['report_name']
     batch_name = request.POST['batch_name']
