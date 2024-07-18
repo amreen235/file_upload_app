@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
@@ -25,7 +26,7 @@ class MyUser(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
 
-    def _str_(self):
+    def __str__(self):
         return self.username
 
     def has_perm(self, perm, obj=None):
@@ -73,5 +74,5 @@ class uploaded_data(models.Model):
     )
     report_name = models.CharField(max_length=255, null=True)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.report_name} - {self.roll_no} - {self.subject_name}"

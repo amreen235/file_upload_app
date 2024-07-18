@@ -63,18 +63,42 @@
         }
 
         th {
-            background-color: #34495e;
-            color: white;
+            
+            color: #34495e;
         }
 
         .wrap-text {
             white-space: pre-line; /* Preserve white space and wrap text */
         }
+
+        @media print {
+        .print-button {
+            display: none;
+        }
+
+        .content-container {
+            border: none;
+            box-shadow: none;
+        }
+
+        th {
+            display: table-cell; /* Ensure table headers are always displayed */
+            color: #34495e; /* Optional: Set the color of table headers for print */
+        }
+
+        thead {
+            display: table-header-group; /* Repeat the table header on each printed page */
+        }
+
+        thead th:not(:first-child) {
+            visibility: visible; /* Ensure all table headers are visible */
+        }
+    }
     </style>
 </head>
 <body>
 <div class="content-container">
-    <h2>DATA</h2>
+   
     <button class="print-button" onclick="window.print()">Print</button>
     <table>
         <thead>
@@ -110,7 +134,7 @@
         </thead>
         <tbody>
         {% for data in report_data %}
-            <tr>
+            <tr  {% if data.obt_grade == 'AB' or data.obt_grade == 'F' %} class="highlighted-row" {% endif %}>
                 <td>{{ data.roll_no }}</td>
                 <td class="wrap-text">{{ data.student_name }}</td>
                 <td class="wrap-text">{{ data.batch_name }}</td>
