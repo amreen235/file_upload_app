@@ -63,7 +63,6 @@
         }
 
         th {
-            
             color: #34495e;
         }
 
@@ -85,24 +84,37 @@
                 box-shadow: none;
             }
 
-            th {
-                display: table-cell; /* Ensure table headers are always displayed */
-                color: #34495e; /* Optional: Set the color of table headers for print */
-            }
-
             thead {
-                display: table-header-group; /* Repeat the table header on each printed page */
+                display: table-header-group; /* Ensure the table header is displayed */
             }
 
             thead th:not(:first-child) {
                 visibility: visible; /* Ensure all table headers are visible */
             }
-    }
+
+            thead {
+                visibility: visible; /* Ensure visibility on first page */
+            }
+
+            tbody, tfoot {
+                break-inside: avoid; /* Avoid breaking inside rows */
+                break-after: auto; /* Allow breaks after table */
+            }
+
+            thead, tfoot {
+                display: table-row-group;
+                break-after: avoid; /* Prevent break after thead */
+            }
+
+            tbody tr {
+                page-break-inside: avoid; /* Avoid breaking inside rows */
+                page-break-after: auto; /* Allow breaks after rows */
+            }
+        }
     </style>
 </head>
 <body>
 <div class="content-container">
-   
     <button class="print-button" onclick="window.print()">Print</button><br>
     <table>
         <thead>
