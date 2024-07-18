@@ -9,7 +9,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background-color: white;
         }
 
         h2 {
@@ -23,7 +23,6 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border: 2px solid black;
             position: relative; /* Ensure relative positioning for absolute positioning */
         }
 
@@ -84,31 +83,9 @@
                 box-shadow: none;
             }
 
-            thead {
-                display: table-header-group; /* Ensure the table header is displayed */
-            }
-
-            thead th:not(:first-child) {
-                visibility: visible; /* Ensure all table headers are visible */
-            }
-
-            thead {
-                visibility: visible; /* Ensure visibility on first page */
-            }
-
-            tbody, tfoot {
-                break-inside: avoid; /* Avoid breaking inside rows */
-                break-after: auto; /* Allow breaks after table */
-            }
-
             thead, tfoot {
                 display: table-row-group;
                 break-after: avoid; /* Prevent break after thead */
-            }
-
-            tbody tr {
-                page-break-inside: avoid; /* Avoid breaking inside rows */
-                page-break-after: auto; /* Allow breaks after rows */
             }
         }
     </style>
@@ -122,8 +99,8 @@
                 <th>SUBJECT NAME : </th>
                 <th>SA MIN MARKS : </th>
                 <th>SA MAX MARKS : </th>
-                <th>AGGREGATE MIN MARKS: </th>
-                <th>AGGREGATE MAX MARKS: </th>
+                <th>AGG MIN MARKS: </th>
+                <th>AGG MAX MARKS: </th>
             </tr>
         </thead>
         <tbody>
@@ -144,7 +121,7 @@
                 <th class="wrap-text">Batch Name</th>
                 <th>FA (CIA For PG)</th>
                 <th>SA (ESE For PG)</th>
-                <th>Aggregate</th>
+                <th>AGG</th>
                 <th>Grade</th>
             </tr>
         </thead>
